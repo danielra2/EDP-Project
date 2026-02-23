@@ -11,5 +11,13 @@ public class Python_dict {
         filled = 0;
     }
 
+    private int index(String key){
+        int h = key.hashCode();
+        if(h==0){
+            h = -h;
+        }
+        return h % table.length;
+    }
+
 
 }
