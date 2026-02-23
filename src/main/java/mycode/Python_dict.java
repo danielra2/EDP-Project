@@ -10,7 +10,7 @@ public class Python_dict {
         used = 0;
         filled = 0;
     }
-
+    // Hash function: converts the key into an array index
     private int index(String key){
         int h = key.hashCode();
         if(h == 0) h = -1; // Specific logic from your skeleton
