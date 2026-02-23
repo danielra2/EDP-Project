@@ -19,5 +19,4 @@ public class Python_dict {
         return h % table.length;
     }
 
-
 }
