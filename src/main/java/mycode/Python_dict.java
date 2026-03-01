@@ -36,6 +36,29 @@ public class Python_dict {
         }
     }
 
+    //delete the key by marking it as deleted
+    public void remove(String key){
+        int hash = index(key);
+        int pos = 0;
+
+        while(true){
+            int idx = (hash + pos * pos) % table.length;
+
+            if(table[idx] == null){
+                return;
+            }
+
+            //if the key is in the dict, mark it as deleted
+            if(!table[idx].delete && table[idx].key.equals(key)){
+                table[idx].delete = true;
+                used--;
+                return;
+            }
+
+            pos++;
+        }
+    }
+
     //insert a new key value pair into the dict
     public void put(String key, String value){
         //if the table is more than 2/3 full, we make it bigger
