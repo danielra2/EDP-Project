@@ -1,11 +1,11 @@
 package mycode;
 
-public class Entry {
-    String key;
-    String value;
+public class Entry<K, V> {
+    K key;
+    V value;
     boolean delete;
 
-    public Entry(String key, String value){
+    public Entry(K key, V value){
         this.key = key;
         this.value = value;
         this.delete = false;

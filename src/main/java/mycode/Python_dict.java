@@ -1,7 +1,7 @@
 package mycode;
 
-public class Python_dict {
-    private Entry[] table;  //storage Array
+public class Python_dict<K, V> {
+    private Entry<K, V>[] table;  //storage Array (added <K, V> to support any data type)
     private int used;       //number of used positions (not deleted)
     private int filled;     //number of positions filled (deleted)
 
@@ -13,7 +13,7 @@ public class Python_dict {
     }
 
     //converts the key into an array index
-    private int index(String key){
+    private int index(K key){
         int h = key.hashCode(); //obtain the hash code
         //avoid negatives
         if(h<0){
@@ -24,7 +24,7 @@ public class Python_dict {
     }
     // method that expands the size of the table
     private void resize(){
-        Entry[] oldTable = table;
+        Entry<K, V>[] oldTable = table;
         table = new Entry[oldTable.length * 2];
         used = 0;
         filled = 0;
@@ -37,7 +37,7 @@ public class Python_dict {
     }
 
     //delete the key by marking it as deleted
-    public void remove(String key){
+    public void remove(K key){
         int hash = index(key);
         int pos = 0;
 
@@ -60,7 +60,7 @@ public class Python_dict {
     }
 
     //insert a new key value pair into the dict
-    public void put(String key, String value){
+    public void put(K key, V value){
         //if the table is more than 2/3 full, we make it bigger
         if((double) filled / table.length > 0.66){
             resize();
@@ -76,7 +76,7 @@ public class Python_dict {
 
             // append a new key value pair if the pos is empty(null)
             if(table[index] == null){
-                table[index] = new Entry(key, value);
+                table[index] = new Entry<>(key, value);
                 used++;
                 filled++;
                 return;
@@ -84,7 +84,7 @@ public class Python_dict {
 
             // if pos was deleted, is reused
             if(table[index].delete){
-                table[index] = new Entry(key, value);
+                table[index] = new Entry<>(key, value);
                 used++;
                 return;
             }
