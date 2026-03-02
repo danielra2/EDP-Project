@@ -36,6 +36,24 @@ public class Python_dict<K, V> {
         }
     }
 
+    //search the value by the key given
+    public V get(K key){
+        int hash = index(key);
+        int pos = 0;
+
+        while(true){
+            int idx = (hash + pos * pos) % table.length;
+
+            if(table[idx] == null){
+                return null;
+            }
+            // if the value is not delete and the key matches with the given, return value
+            if(!table[idx].delete && table[idx].key.equals(key)){
+                return table[idx].value;
+            }
+        }
+    }
+
     //delete the key by marking it as deleted
     public void remove(K key){
         int hash = index(key);
