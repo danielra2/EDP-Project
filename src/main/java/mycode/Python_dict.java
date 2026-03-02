@@ -51,11 +51,12 @@ public class Python_dict<K, V> {
             if(!table[idx].delete && table[idx].key.equals(key)){
                 return table[idx].value;
             }
+            pos++;
         }
     }
 
     //delete the key by marking it as deleted
-    public void remove(K key){
+    public void del(K key){
         int hash = index(key);
         int pos = 0;
 
@@ -71,6 +72,30 @@ public class Python_dict<K, V> {
                 table[idx].delete = true;
                 used--;
                 return;
+            }
+
+            pos++;
+        }
+    }
+
+    //delete the key from the dict and return de value
+    public V pop(K key){
+        int hash = index(key);
+        int pos = 0;
+
+        while(true){
+            int idx = (hash + pos * pos) % table.length;
+
+            if(table[idx] == null){
+                throw new KeyError((String) key);
+            }
+
+            if(!table[idx].delete && table[idx].key.equals(key)){
+                V value = table[idx].value;
+                table[idx].delete = true;
+                used--;
+                return value;
+
             }
 
             pos++;
