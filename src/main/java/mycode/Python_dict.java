@@ -101,6 +101,12 @@ public class Python_dict<K, V> {
             pos++;
         }
     }
+    // delete all the key-value pairs
+    public void clear(){
+        table = new Entry[table.length];
+        used = 0;
+        filled = 0;
+    }
 
     //insert a new key value pair into the dict
     public void put(K key, V value){
