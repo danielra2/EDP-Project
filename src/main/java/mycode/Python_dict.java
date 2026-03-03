@@ -108,6 +108,17 @@ public class Python_dict<K, V> {
         filled = 0;
     }
 
+    public Python_dict<K, V> copy(){
+        Python_dict<K, V> newDict = new Python_dict<>(table.length);
+
+        for(int i=0; i<table.length;i++){
+            if(table[i] != null && !table[i].delete){
+                newDict.put(table[i].key, table[i].value);
+            }
+        }
+        return newDict;
+    }
+
     //insert a new key value pair into the dict
     public void put(K key, V value){
         //if the table is more than 2/3 full, we make it bigger
