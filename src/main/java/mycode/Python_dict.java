@@ -145,6 +145,19 @@ public class Python_dict<K, V> {
         return result;
     }
 
+    public Item<K, V>[] items(){
+        Item<K, V>[] result = (Item<K, V>[]) new Item[used];
+
+        int j=0;
+        for(int i=0;i<table.length;i++){
+            if(table[i] != null && !table[i].delete){
+                result[j] = new Item<>(table[i].key, table[i].value);
+                j++;
+            }
+        }
+        return result;
+    }
+
     //insert a new key value pair into the dict
     public void put(K key, V value){
         //if the table is more than 2/3 full, we make it bigger
