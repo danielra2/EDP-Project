@@ -211,6 +211,21 @@ public class Python_dict<K, V> {
             //incrementing position
             pos++;
         }
+
+
+    }
+
+    public Item<K, V> popItems(){
+        if(head==null){
+            throw new KeyError("Dictionary is empty");
+        }
+
+        Entry<K, V> last = tail;
+        last.delete = true;
+        used--;
+
+        unlink(last);
+        return new Item<>(last.key, last.value);
     }
 
     private void linkLast(Entry<K, V> e) {
