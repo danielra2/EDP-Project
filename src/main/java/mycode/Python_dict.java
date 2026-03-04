@@ -5,20 +5,23 @@ public class Python_dict<K, V> {
     private int used;       //number of used positions (not deleted)
     private int filled;     //number of positions filled (deleted)
 
+    private Entry<K, V> head;
+    private Entry<K, V> tail;
+
     //constructor
     public Python_dict(int capacity){
         table = new Entry[capacity];
         used = 0;
         filled = 0;
+        head = null;
+        tail = null;
     }
 
     //converts the key into an array index
     private int index(K key){
         int h = key.hashCode(); //obtain the hash code
         //avoid negatives
-        if(h<0){
-            h = -h;
-        }
+        h = Math.abs(h);
         // size adjustment
         return h % table.length;
     }
@@ -28,6 +31,8 @@ public class Python_dict<K, V> {
         table = new Entry[oldTable.length * 2];
         used = 0;
         filled = 0;
+        head = null;
+        tail = null;
 
         for(int i=0; i<oldTable.length; i++){
             if(oldTable[i] != null && !oldTable[i].delete){
@@ -41,7 +46,7 @@ public class Python_dict<K, V> {
         int hash = index(key);
         int pos = 0;
 
-        while(true){
+        while(pos < table.length){
             int idx = (hash + pos * pos) % table.length;
 
             if(table[idx] == null){
@@ -53,6 +58,7 @@ public class Python_dict<K, V> {
             }
             pos++;
         }
+        return null;
     }
 
     //delete the key by marking it as deleted
@@ -60,7 +66,7 @@ public class Python_dict<K, V> {
         int hash = index(key);
         int pos = 0;
 
-        while(true){
+        while(pos < table.length){
             int idx = (hash + pos * pos) % table.length;
 
             if(table[idx] == null){
@@ -71,9 +77,10 @@ public class Python_dict<K, V> {
             if(!table[idx].delete && table[idx].key.equals(key)){
                 table[idx].delete = true;
                 used--;
+
+                unlink(table[idx]);
                 return;
             }
-
             pos++;
         }
     }
@@ -83,77 +90,81 @@ public class Python_dict<K, V> {
         int hash = index(key);
         int pos = 0;
 
-        while(true){
+        while(pos < table.length){
             int idx = (hash + pos * pos) % table.length;
 
             if(table[idx] == null){
-                throw new KeyError((String) key);
+                throw new KeyError(key);
             }
 
             if(!table[idx].delete && table[idx].key.equals(key)){
                 V value = table[idx].value;
                 table[idx].delete = true;
                 used--;
+
+                unlink(table[idx]);
                 return value;
 
             }
 
             pos++;
         }
+        throw new KeyError(key);
     }
     // delete all the key-value pairs
     public void clear(){
         table = new Entry[table.length];
         used = 0;
         filled = 0;
+        head = null;
+        tail = null;
+
     }
 
-    public Python_dict<K, V> copy(){
+    public Python_dict<K, V> copy() {
         Python_dict<K, V> newDict = new Python_dict<>(table.length);
 
-        for(int i=0; i<table.length;i++){
-            if(table[i] != null && !table[i].delete){
-                newDict.put(table[i].key, table[i].value);
-            }
+        Entry<K, V> current = head;
+        while (current != null) {
+            newDict.put(current.key, current.value);
+            current = current.next;
         }
         return newDict;
     }
 
-    public  K[] keys(){
+    public K[] keys(){
         K[] result = (K[]) new Object[used];
+        int i = 0;
 
-        int j=0;
-        for(int i=0;i<table.length;i++){
-            if(table[i] != null && !table[i].delete){
-                result[j] = table[i].key;
-                j++;
-            }
+        Entry<K, V> current = head;
+        while (current != null) {
+            result[i++] = current.key;
+            current = current.next;
         }
         return result;
     }
 
-    public V[] values(){
+    public V[] values() {
         V[] result = (V[]) new Object[used];
+        int i = 0;
 
-        int j=0;
-        for(int i=0;i<table.length;i++){
-            if(table[i] != null && !table[i].delete){
-                result[j] = table[i].value;
-                j++;
-            }
+        Entry<K, V> current = head;
+        while (current != null) {
+            result[i++] = current.value;
+            current = current.next;
         }
         return result;
     }
 
-    public Item<K, V>[] items(){
+    public Item<K, V>[] items() {
         Item<K, V>[] result = (Item<K, V>[]) new Item[used];
+        int i = 0;
 
-        int j=0;
-        for(int i=0;i<table.length;i++){
-            if(table[i] != null && !table[i].delete){
-                result[j] = new Item<>(table[i].key, table[i].value);
-                j++;
-            }
+        // MODIFICADO
+        Entry<K, V> current = head;
+        while (current != null) {
+            result[i++] = new Item<>(current.key, current.value);
+            current = current.next;
         }
         return result;
     }
@@ -170,7 +181,7 @@ public class Python_dict<K, V> {
         //current position
         int pos = 0;
 
-        while(true){
+        while(pos < table.length){
             int index = (hashIdx + pos * pos) % table.length;
 
             // append a new key value pair if the pos is empty(null)
@@ -178,6 +189,8 @@ public class Python_dict<K, V> {
                 table[index] = new Entry<>(key, value);
                 used++;
                 filled++;
+
+                linkLast(table[index]);
                 return;
             }
 
@@ -185,6 +198,8 @@ public class Python_dict<K, V> {
             if(table[index].delete){
                 table[index] = new Entry<>(key, value);
                 used++;
+
+                linkLast(table[index]);
                 return;
             }
 
@@ -196,6 +211,33 @@ public class Python_dict<K, V> {
             //incrementing position
             pos++;
         }
+    }
+
+    private void linkLast(Entry<K, V> e) {
+        if (tail == null) {
+            head = tail = e;
+        } else {
+            tail.next = e;
+            e.prev = tail;
+            tail = e;
+        }
+    }
+
+    private void unlink(Entry<K, V> e) {
+        if (e.prev != null) {
+            e.prev.next = e.next;
+        } else {
+            head = e.next;
+        }
+
+        if (e.next != null) {
+            e.next.prev = e.prev;
+        } else {
+            tail = e.prev;
+        }
+
+        e.prev = null;
+        e.next = null;
     }
 
 }
