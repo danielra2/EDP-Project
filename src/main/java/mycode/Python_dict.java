@@ -255,4 +255,16 @@ public class Python_dict<K, V> {
         e.next = null;
     }
 
+
+    public void update(Python_dict<K, V> other) {
+
+        Entry<K, V> current = other.head;
+
+        while (current != null) {
+            if (!current.delete) {
+                this.put(current.key, current.value);
+            }
+            current = current.next;
+        }
+    }
 }
