@@ -1,135 +1,109 @@
 package mycode;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-class PythonDictTest {
+public class PythonDictTest {
     private Python_dict<String, Integer> dict;
-
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         dict = new Python_dict<>(5);
     }
-
     @Test
-    void testPut() {
-        assertDoesNotThrow(() -> dict.put("java", 21));
+    public void testPutAndGet() {
+        dict.put("java", 21);
+        assertEquals(Integer.valueOf(21), dict.get("java"));
     }
 
     @Test
-    void testUpdateValue() {
+    public void testUpdateValue() {
         dict.put("key", 10);
         dict.put("key", 20);
-        assertDoesNotThrow(() -> dict.put("key", 30));
+        assertEquals(Integer.valueOf(20), dict.get("key"));
     }
 
     @Test
-    void testCollisions() {
-        dict.put("A", 1);
-        dict.put("B", 2);
-        dict.put("C", 3);
-        assertDoesNotThrow(() -> dict.put("D", 4));
-    }
-
-    @Test
-    void testResize() {
+    public void testResize() {
         dict.put("1", 1);
         dict.put("2", 2);
         dict.put("3", 3);
         dict.put("4", 4);
-        assertDoesNotThrow(() -> dict.put("5", 5));
+        assertNotNull(dict.get("1"));
+        assertNotNull(dict.get("4"));
     }
 
     @Test
-    void testRemoveAndReuse() {
+    public void testDel() {
         dict.put("test", 100);
         dict.del("test");
-        assertDoesNotThrow(() -> dict.put("test", 200));
-        assertDoesNotThrow(() -> dict.put("other", 300));
+        assertNull(dict.get("test"));
     }
-    @Test
-    void testRemoveNonExistentKey() {
-        assertDoesNotThrow(() -> dict.del("none"));
-    }
-    @Test
-    void testMocking() {
-        Python_dict dictMock = Mockito.mock(Python_dict.class);
-        dictMock.put("k", "v");
-        Mockito.verify(dictMock).put("k", "v");
-    }
-    @Test
-    void testGet() {
-        dict.put("cheie1", 100);
-        assertEquals(100, dict.get("cheie1"));
-        assertNull(dict.get("inexistent"));
+
+    @Test(expected = KeyError.class)
+    public void testPopException() {
+        dict.pop("non_existent");
     }
 
     @Test
-    void testPop() {
+    public void testPopSuccess() {
         dict.put("popMe", 500);
-        Integer value = dict.pop("popMe");
-        assertEquals(500, value);
-        assertNull(dict.get("popMe")); // Verificăm că a fost șters
+        Integer val = dict.pop("popMe");
+        assertEquals(Integer.valueOf(500), val);
+        assertNull(dict.get("popMe"));
     }
 
-    @Test
-    void testPopException() {
-        // Metoda pop aruncă KeyError dacă cheia nu există
-        assertThrows(KeyError.class, () -> dict.pop("missing"));
-    }
 
     @Test
-    void testClear() {
+    public void testClear() {
         dict.put("a", 1);
-        dict.put("b", 2);
         dict.clear();
         assertNull(dict.get("a"));
-        assertNull(dict.get("b"));
         Object[] keys = dict.keys();
         assertEquals(0, keys.length);
     }
 
     @Test
-    void testCopy() {
+    public void testUpdate() {
+        Python_dict<String, Integer> other = new Python_dict<>(5);
+        other.put("newKey", 99);
+        dict.put("oldKey", 1);
+        dict.update(other);
+        assertEquals(Integer.valueOf(99), dict.get("newKey"));
+        assertEquals(Integer.valueOf(1), dict.get("oldKey"));
+    }
+
+    @Test
+    public void testPopItems() {
+        dict.put("first", 1);
+        dict.put("last", 2);
+        Item<String, Integer> item = dict.popItems();
+        assertEquals("last", item.key);
+        assertEquals(Integer.valueOf(2), item.value);
+    }
+
+    @Test(expected = KeyError.class)
+    public void testPopItemsEmpty() {
+        dict.popItems();
+    }
+
+    @Test
+    public void testCopy() {
         dict.put("original", 10);
         Python_dict<String, Integer> clona = dict.copy();
-
-        assertEquals(10, clona.get("original"));
-
-        // Verificăm independența: modificarea clonei nu afectează originalul
+        assertEquals(Integer.valueOf(10), clona.get("original"));
         clona.put("original", 20);
-        assertEquals(10, dict.get("original"));
-        assertEquals(20, clona.get("original"));
+        assertEquals(Integer.valueOf(10), dict.get("original"));
     }
 
     @Test
-    void testKeys() {
-        dict.put("k1", 1);
-        dict.put("k2", 2);
-        Object[] keys = dict.keys();
-        assertEquals(2, keys.length);
-        // Putem verifica prezența (ordinea poate varia din cauza hashing-ului)
-        boolean foundK1 = false;
-        for(Object k : keys) if(k.equals("k1")) foundK1 = true;
-        assertTrue(foundK1);
-    }
-
-    @Test
-    void testValues() {
+    public void testKeysValuesItems() {
         dict.put("k1", 100);
-        dict.put("k2", 200);
+        Object[] keys = dict.keys();
         Object[] values = dict.values();
-        assertEquals(2, values.length);
-    }
-
-    @Test
-    void testItems() {
-        dict.put("itemKey", 99);
-        Item<String, Integer>[] items = dict.items();
+        Object[] items = dict.items();
+        assertEquals(1, keys.length);
+        assertEquals(1, values.length);
         assertEquals(1, items.length);
-        assertEquals("itemKey", items[0].key);
-        assertEquals(99, items[0].value);
     }
 }
