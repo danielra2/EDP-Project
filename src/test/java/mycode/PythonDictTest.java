@@ -5,10 +5,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class PythonDictTest {
-    private Python_dict<String, Integer> dict;
+    private PythonDict<String, Integer> dict;
     @Before
     public void setUp() {
-        dict = new Python_dict<>(5);
+        dict = new PythonDict<>(5);
     }
     @Test
     public void testPutAndGet() {
@@ -65,7 +65,7 @@ public class PythonDictTest {
 
     @Test
     public void testUpdate() {
-        Python_dict<String, Integer> other = new Python_dict<>(5);
+        PythonDict<String, Integer> other = new PythonDict<>(5);
         other.put("newKey", 99);
         dict.put("oldKey", 1);
         dict.update(other);
@@ -90,7 +90,7 @@ public class PythonDictTest {
     @Test
     public void testCopy() {
         dict.put("original", 10);
-        Python_dict<String, Integer> clona = dict.copy();
+        PythonDict<String, Integer> clona = dict.copy();
         assertEquals(Integer.valueOf(10), clona.get("original"));
         clona.put("original", 20);
         assertEquals(Integer.valueOf(10), dict.get("original"));

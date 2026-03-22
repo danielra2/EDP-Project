@@ -1,6 +1,6 @@
 package mycode;
 
-public class Python_dict<K, V> {
+public class PythonDict<K, V> {
     private Entry<K, V>[] table;  //storage Array (added <K, V> to support any data type)
     private int used;       //number of used positions (not deleted)
     private int filled;     //number of positions filled (deleted)
@@ -9,7 +9,7 @@ public class Python_dict<K, V> {
     private Entry<K, V> tail;
 
     //constructor
-    public Python_dict(int capacity){
+    public PythonDict(int capacity){
         table = new Entry[capacity];
         used = 0;
         filled = 0;
@@ -121,8 +121,8 @@ public class Python_dict<K, V> {
 
     }
 
-    public Python_dict<K, V> copy() {
-        Python_dict<K, V> newDict = new Python_dict<>(table.length);
+    public PythonDict<K, V> copy() {
+        PythonDict<K, V> newDict = new PythonDict<>(table.length);
 
         Entry<K, V> current = head;
         while (current != null) {
@@ -256,7 +256,7 @@ public class Python_dict<K, V> {
     }
 
 
-    public void update(Python_dict<K, V> other) {
+    public void update(PythonDict<K, V> other) {
 
         Entry<K, V> current = other.head;
 
